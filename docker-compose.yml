@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  vscode-server:
+    container_name: code
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: melashri/code:latest
+    ports:
+      - "2906:2906"
+    volumes:
+      - /home/docker/volumes/code:/home/vscode/
+    networks:
+      - vsocde-network
+networks:
+  vsocde-network:
+    external: false
+    name: vsocde-network
