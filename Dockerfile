@@ -1,11 +1,13 @@
-# Ubuntu as the base image
+# Use Ubuntu as the base image
 FROM ubuntu:latest
 
-# Set arguments for externalizing sensitive information
+# Set arguments for externalizing sensitive information and for UID/GID
 ARG ROOT_PASSWORD
 ARG CONNECTION_TOKEN
+ARG USER_UID=1000
+ARG USER_GID=1000
 
-# Install necessary packages in a single RUN command to reduce the number of layers
+# Install necessary packages
 RUN apt-get update && \
     apt-get install -y software-properties-common apt-transport-https wget gpg sudo nano git curl wget unzip npm ssh && \
     wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | gpg --dearmor | tee /etc/apt/trusted.gpg.d/microsoft.gpg && \
@@ -14,9 +16,9 @@ RUN apt-get update && \
     apt-get install -y code && \
     echo "root:${ROOT_PASSWORD}" | chpasswd
 
-
-# Create a non-root user for running applications
-RUN useradd -m vscode && \
+# Create a non-root user with specified UID/GID, and set passwordless sudo
+RUN groupadd -g ${USER_GID} vscode && \
+    useradd -m -u ${USER_UID} -g vscode -s /bin/bash vscode && \
     echo "vscode ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/vscode
 
 # Switch to the non-root user
@@ -28,6 +30,5 @@ ENV HOME /home/vscode
 # Expose the port for VS Code
 EXPOSE 2906
 
-# Start Visual Studio Code on port 2906
-CMD ["code", "serve-web", "--host", "0.0.0.0", "--port", "2906", "--user-data-dir", "/home/vscode", "--connection-token", "${CONNECTION_TOKEN}"]
-
+# Start Visual Studio Code on port 2906 with specified settings
+CMD ["code", "--auth", "none", "--disable-telemetry", "--port", "2906", "--host", "0.0.0.0", "--user-data-dir", "/home/vscode", "--connection-token", "${CONNECTION_TOKEN}"]
