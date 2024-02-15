@@ -16,8 +16,8 @@ RUN apt-get update && \
 
 
 # Create a non-root user for running applications
-RUN useradd -m vscod && \
-    echo "vscodeuser ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/vscodeuser
+RUN useradd -m vscode && \
+    echo "vscode ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/vscode
 
 # Switch to the non-root user
 USER vscode
