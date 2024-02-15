@@ -6,14 +6,19 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        ROOT_PASSWORD: ${ROOT_PASSWORD}
+        CONNECTION_TOKEN: ${CONNECTION_TOKEN}
+        USER_UID: ${USER_UID:-1000}  # Default to 1000 if not specified
+        USER_GID: ${USER_GID:-1000}  # Default to 1000 if not specified
     image: melashri/code:latest
     ports:
       - "2906:2906"
     volumes:
       - /home/docker/volumes/code:/home/vscode/
     networks:
-      - vsocde-network
+      - vscode-network
+
 networks:
-  vsocde-network:
-    external: false
-    name: vsocde-network
+  vscode-network:
+    name: vscode-network
